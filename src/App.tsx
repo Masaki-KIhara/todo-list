@@ -1,9 +1,40 @@
+import { ChangeEvent, useEffect, useState } from "react";
+
+type TableBodyType = {
+  date: string;
+  content: string;
+};
+
 function App() {
   const tableHeaderList = ["選択", "登録日", "TODO", "削除"];
-  const tableBodyList = [
-    { date: "2023/8/11", content: "掃除" },
-    { date: "2023/8/11", content: "掃除" },
-  ];
+  const [inputValue, setInputValue] = useState<string>("");
+  const [tableBody, setTableBody] = useState<TableBodyType>({
+    date: "",
+    content: "",
+  });
+  const [tableBodyList, setTableBodyList] = useState<TableBodyType[]>([]);
+
+  const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const addTable = () => {
+    setTableBodyList((prev) => [...prev, tableBody]);
+  };
+
+  const deleteTable = (key: number) => {
+    tableBodyList.splice(key, 1);
+    setTableBodyList((prev) => [...prev]);
+  };
+
+  useEffect(() => {
+    const now = new Date();
+    const refistrationDay = `${now.getFullYear()}/${
+      now.getMonth() + 1
+    }/${now.getDate()}`;
+    setTableBody({ date: refistrationDay, content: inputValue });
+  }, [inputValue]);
+
   return (
     <>
       <header className="border border-gray bg-gray p-[10px]">
@@ -13,52 +44,66 @@ function App() {
         <input
           className="pl-[5px] border border-gray rounded w-[200px]"
           placeholder="TODOを入力"
+          value={inputValue}
+          onChange={onChangeInput}
         />
-        <button className="border border-gray w-[50px] bg-gray text-white rounded">
+        <button
+          className="border border-gray w-[50px] bg-gray text-white rounded"
+          onClick={addTable}
+        >
           追加
         </button>
       </div>
-      <p className="text-center pt-10">本日のTODOは二件です</p>
+      <p className="text-center pt-10">
+        本日のTODOは{tableBodyList.length}個です
+      </p>
       <div className="flex justify-center pt-[10px]">
-        <table>
-          <thead>
-            <tr>
-              {tableHeaderList.map((item) => {
+        {tableBodyList.length === 0 ? (
+          <p>登録されているTODOはありません。</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                {tableHeaderList.map((item, key) => {
+                  return (
+                    <th
+                      key={key}
+                      className="bg-gray-100 px-3 py-1 border-[1px] border-gray-200"
+                    >
+                      {item}
+                    </th>
+                  );
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              {tableBodyList.map((item, key) => {
                 return (
-                  <th className="bg-gray-100 px-3 py-1 border-[1px] border-gray-200">
-                    {item}
-                  </th>
+                  <tr key={key}>
+                    <td className="text-center max-w-[440px] min-w-[120px] border-[1px] border-gray-200">
+                      <input type="checkbox" />
+                    </td>
+                    <td className="max-w-[440px] px-[10px] min-w-[120px] border-[1px] border-gray-200 text-center break-all">
+                      {item.date}
+                    </td>
+                    <td className="max-w-[440px] px-[10px] min-w-[120px] border-[1px] border-gray-200 text-center break-all">
+                      {item.content}
+                    </td>
+                    <td className="max-w-[440px] px-[10px] min-w-[120px] border-[1px] border-gray-200 text-center break-all">
+                      <button
+                        onClick={() => {
+                          deleteTable(key);
+                        }}
+                      >
+                        削除
+                      </button>
+                    </td>
+                  </tr>
                 );
               })}
-            </tr>
-          </thead>
-          <tbody>
-            {tableBodyList.map((item, key) => {
-              return (
-                <tr key={key}>
-                  <td className="text-center max-w-[440px] min-w-[120px] border-[1px] border-gray-200">
-                    <input type="checkbox" />
-                  </td>
-                  <td className="max-w-[440px] px-[10px] min-w-[120px] border-[1px] border-gray-200 text-center break-all">
-                    {item.date}
-                  </td>
-                  <td className="max-w-[440px] px-[10px] min-w-[120px] border-[1px] border-gray-200 text-center break-all">
-                    {item.content}
-                  </td>
-                  <td className="max-w-[440px] px-[10px] min-w-[120px] border-[1px] border-gray-200 text-center break-all">
-                    <button
-                      onClick={() => {
-                        alert(`${key}`);
-                      }}
-                    >
-                      削除
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        )}
       </div>
     </>
   );

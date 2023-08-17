@@ -21,6 +21,7 @@ function App() {
   });
   const [tableBodyList, setTableBodyList] = useState<TableBodyType[]>([]);
   const [checkedList, setCheckedList] = useState<Array<number>>([]);
+  const [checkAllState, setCheckedAllState] = useState<boolean>(false);
   const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -36,11 +37,9 @@ function App() {
 
   const deleteAllTable = () => {
     if (window.confirm("選択されているTODOを削除しますか？")) {
-      checkedList.reverse().forEach((item) => {
-        tableBodyList.splice(item, 1);
-        setCheckedList([]);
-        setTableBodyList((prev) => [...prev]);
-      });
+      setTableBodyList(tableBodyList.filter((item) => item.checked === false));
+      setCheckedList([]);
+      setCheckedAllState(false);
     }
   };
 
@@ -49,6 +48,7 @@ function App() {
     const upDateList = [...tableBodyList];
     upDateList[key].checked = val.target.checked;
     setTableBodyList(upDateList);
+    setCheckedAllState(false);
     if (val.target.checked === true) {
       checkedList.push(key);
       setCheckedList(checkedList);
@@ -63,6 +63,7 @@ function App() {
   };
 
   const checkAll = (val: ChangeEvent<HTMLInputElement>) => {
+    setCheckedAllState(val.target.checked);
     setTableBodyList(
       tableBodyList.map((item) => ({
         ...item,
@@ -121,12 +122,18 @@ function App() {
           <p>登録されているTODOはありません。</p>
         ) : (
           <div>
-            <button onClick={deleteAllTable}>一括削除</button>
+            {checkedList.length !== 0 && (
+              <button onClick={deleteAllTable}>一括削除</button>
+            )}
             <table>
               <thead>
                 <tr>
                   <th className="text-center max-w-[440px] min-w-[120px] border-[1px] border-gray-200">
-                    <input type="checkbox" onChange={checkAll} />
+                    <input
+                      type="checkbox"
+                      onChange={checkAll}
+                      checked={checkAllState}
+                    />
                     選択
                   </th>
                   {tableHeaderList.map((item, key) => {

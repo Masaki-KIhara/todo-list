@@ -6,7 +6,6 @@ function App() {
     inputValue,
     tableBodyList,
     checkAllState,
-    checkedList,
     onChangeInput,
     addTable,
     deleteTable,
@@ -42,9 +41,8 @@ function App() {
           <p>登録されているTODOはありません。</p>
         ) : (
           <div>
-            {checkedList.length !== 0 && (
-              <button onClick={deleteAllTable}>一括削除</button>
-            )}
+            {tableBodyList.filter((item) => item.checked === true).length !==
+              0 && <button onClick={deleteAllTable}>一括削除</button>}
             <table>
               <thead>
                 <tr>
